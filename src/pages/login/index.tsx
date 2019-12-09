@@ -2,9 +2,10 @@ import { Link } from '@reach/router';
 import { Formik } from 'formik';
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import * as yup from 'yup';
 
+import { FormError } from '../../components';
 import { MIN_PASSWORD_LENGTH } from '../../shared/constants';
 import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from '../../stores/user';
 
@@ -13,13 +14,10 @@ type Props = {
 };
 
 const schema = yup.object({
-  email: yup
+  userName: yup
     .string()
-    .required()
-    .matches(
-      /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-      "The provided string is not an email"
-    ),
+    .required("This field is required")
+    .trim(),
   password: yup
     .string()
     .required()
@@ -30,9 +28,10 @@ const schema = yup.object({
 @observer
 class LoginPage extends Component<Props> {
   render() {
-    const userService = this.props[USER_STORE_TOKEN];
-    const email = userService!.isSignedUp ? userService!.user!.email : '';
-    const password = userService!.isSignedUp ? userService!.user!.password : '';
+    const userStore = this.props[USER_STORE_TOKEN];
+    const isSubmitting = userStore!.isLoading;
+    const userName = userStore!.isSignedUp ? userStore!.user!.userName : '';
+    const password = userStore!.isSignedUp ? userStore!.user!.password : '';
 
     return (
       <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
@@ -42,9 +41,9 @@ class LoginPage extends Component<Props> {
             Please authorize to have full access to the web site.
           </span>
           <Formik
-            initialValues={{ email, password }}
+            initialValues={{ userName, password }}
             validationSchema={schema}
-            onSubmit={console.log}
+            onSubmit={values => userStore!.login(values)}
             validateOnBlur={true}
           >
             {({
@@ -60,16 +59,16 @@ class LoginPage extends Component<Props> {
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="text"
-                    name="email"
-                    placeholder="john@doe.com"
-                    value={values.email}
-                    isValid={touched.email && !errors.email}
+                    name="userName"
+                    placeholder="Username"
+                    value={values.userName}
+                    isValid={touched.userName && !errors.userName}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    isInvalid={touched.email && !!errors.email}
+                    isInvalid={touched.userName && !!errors.userName}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.email}
+                    {errors.userName}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId="formBasicPassword">
@@ -88,10 +87,15 @@ class LoginPage extends Component<Props> {
                     {errors.password}
                   </Form.Control.Feedback>
                 </Form.Group>
+                <FormError text={userStore!.errorReason.get() || ""} />
                 <Row className="justify-content-between align-items-center">
                   <Col md="6" xs="12" className="mb-2 mb-sm-0 ">
-                    <Button type="submit" className="w-100">
-                      Log in
+                  <Button
+                      type="submit"
+                      className="w-100"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? <Spinner animation="border" /> : "Log in"}
                     </Button>
                   </Col>
                   <Col md="6" xs="12" className="text-center text-md-left">

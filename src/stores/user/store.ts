@@ -62,7 +62,27 @@ export class UserStore {
     } catch (e) {
       runInAction(() => {
         this.state.set(States.FAILED);
-        this.errorReason = e.message;
+        this.errorReason.set(e.message);
+      });
+    }
+  }
+
+  @action
+  async login(payload: Pick<Account, "userName" | "password">) {
+    try {
+      runInAction(() => {
+        this.state.set(States.LOADING);
+        this.errorReason.set("");
+      });
+      const accessToken = await this.userService.authorize(payload);
+      runInAction(() => {
+        this.user!.accessToken = accessToken;
+        this.state.set(States.SUCCESS);
+      });
+    } catch (e) {
+      runInAction(() => {
+        this.state.set(States.FAILED);
+        this.errorReason.set(e.message);
       });
     }
   }

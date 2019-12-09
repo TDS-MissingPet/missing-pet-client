@@ -29,7 +29,7 @@ export class UserService {
         LastName: payload.lastName,
         PhoneNumber: payload.phoneNumber
       };
-      await this._http.post("/api/account", apiBody);
+      await this._http.post<void>("/api/account", apiBody);
       this._user = payload;
       return this._user;
     } catch (e) {
@@ -37,6 +37,28 @@ export class UserService {
       const normalizedErrorMessage = res
         ? flatten(Object.values(res.data.ModelState)).join("\n")
         : "Something went wrong, please try again later";
+      throw new Error(normalizedErrorMessage);
+    }
+  }
+
+  async authorize(payload: Pick<Account, "userName" | "password">) {
+    try {
+      const apiBody = {
+        grant_type: "password",
+        username: payload.userName,
+        password: payload.password
+      };
+      const res = await this._http.post<{ access_token: string }>("/token", apiBody, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      });
+      return res.data.access_token;
+    } catch (e) {
+      const res = (e as AxiosError).response;
+      const normalizedErrorMessage =
+        (res && res.data && res.data.error_description) ||
+        "Something went wrong, please try again later";
       throw new Error(normalizedErrorMessage);
     }
   }
