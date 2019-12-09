@@ -1,8 +1,8 @@
+import { RouteComponentProps, navigate } from '@reach/router';
 import { inject, observer } from 'mobx-react';
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { STORE_TOKEN as USER_STORE_TOKEN, User, UserStore } from '../../stores/user';
-import { RouteComponentProps } from '@reach/router';
 
 export interface Props {
   [USER_STORE_TOKEN]?: UserStore;
@@ -15,7 +15,7 @@ const AuthManager: React.SFC<RouteComponentProps<Props>> = ({ UserStore, check =
   const valid = useMemo(() => check!(UserStore!.user), [check, UserStore]);
   useEffect(() => {
     if (!valid && fallback && typeof fallback === 'string') {
-      routerProps!.navigate!(fallback);
+      navigate(fallback);
     }
   });
 

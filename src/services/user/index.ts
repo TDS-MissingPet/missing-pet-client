@@ -5,13 +5,14 @@ import flatten from "lodash/flatten";
 import { User } from "../../stores/user";
 import { httpClient } from "../http";
 import { Account } from "./types";
+import { MISSING_PET_USER_COOKIE } from "../../shared/constants";
 
 export class UserService {
   private readonly _http: AxiosInstance = httpClient;
   private _user?: User;
 
   constructor() {
-    this._user = Cookie.getJSON("user_user");
+    this._user = Cookie.getJSON(MISSING_PET_USER_COOKIE);
   }
 
   get user() {
@@ -48,11 +49,13 @@ export class UserService {
         username: payload.userName,
         password: payload.password
       };
-      const res = await this._http.post<{ access_token: string }>("/token", apiBody, {
+      const res = await this._http.post<{ access_token: string, userName: string }>("/token", apiBody, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         }
       });
+      this.storeUser(res.data);
+
       return res.data.access_token;
     } catch (e) {
       const res = (e as AxiosError).response;
@@ -61,6 +64,13 @@ export class UserService {
         "Something went wrong, please try again later";
       throw new Error(normalizedErrorMessage);
     }
+  }
+
+  private storeUser(data: { access_token: string, userName: string }) {
+    const user = this._user || {} as Partial<User>;
+    user.accessToken = data.access_token;
+    user.userName = user.userName || data.userName;
+    Cookie.set(MISSING_PET_USER_COOKIE, JSON.stringify(user));
   }
 }
 
