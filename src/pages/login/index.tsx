@@ -30,6 +30,10 @@ const schema = yup.object({
 @observer
 class LoginPage extends Component<Props> {
   render() {
+    const userService = this.props[USER_STORE_TOKEN];
+    const email = userService!.isSignedUp ? userService!.user!.email : '';
+    const password = userService!.isSignedUp ? userService!.user!.password : '';
+
     return (
       <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
         <div className="form-container__form p-3 rounded">
@@ -38,7 +42,7 @@ class LoginPage extends Component<Props> {
             Please authorize to have full access to the web site.
           </span>
           <Formik
-            initialValues={{ email: "", password: "" }}
+            initialValues={{ email, password }}
             validationSchema={schema}
             onSubmit={console.log}
             validateOnBlur={true}

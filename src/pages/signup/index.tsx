@@ -1,15 +1,22 @@
-import { Link } from '@reach/router';
-import { Formik } from 'formik';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
-import * as yup from 'yup';
+import { Link, navigate } from "@reach/router";
+import { Formik } from "formik";
+import * as mobx from "mobx";
+import { inject, observer } from "mobx-react";
+import React, { Component } from "react";
+import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
+import * as yup from "yup";
 
-import { MIN_PASSWORD_LENGTH } from '../../shared/constants';
-import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from '../../stores/user';
+import { FormError } from "../../components";
+import { MIN_PASSWORD_LENGTH } from "../../shared/constants";
+import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from "../../stores/user";
+import {
+  STORE_TOKEN as NOTIFICATION_STORE_TOKEN,
+  NotificationStore
+} from "../../stores/notification";
 
 type Props = {
   [USER_STORE_TOKEN]?: UserStore;
+  [NOTIFICATION_STORE_TOKEN]?: NotificationStore;
 };
 
 const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
@@ -38,13 +45,36 @@ const schema = yup.object({
     .string()
     .required("This field is required")
     .trim()
-    .matches(phoneRegExp, "Phone number is not valid")
+    .matches(phoneRegExp, "Phone number is not valid"),
+  userName: yup
+    .string()
+    .required("This field is required")
+    .trim()
 });
 
-@inject(USER_STORE_TOKEN)
+@inject(USER_STORE_TOKEN, NOTIFICATION_STORE_TOKEN)
 @observer
 class SignUpPage extends Component<Props> {
+  componentDidMount() {
+    const userStore = this.props[USER_STORE_TOKEN];
+    const notificationStore = this.props[NOTIFICATION_STORE_TOKEN];
+
+    mobx.reaction(
+      () => userStore!.isSignedUp,
+      () => {
+        notificationStore!.addNotification({
+          message: "Account was created, please log in to proceed",
+          type: "success"
+        });
+        navigate("authorization");
+      }
+    );
+  }
+
   render() {
+    const userStore = this.props[USER_STORE_TOKEN];
+    const isSubmitting = userStore!.isLoading;
+
     return (
       <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
         <div className="form-container__form p-3 rounded">
@@ -58,10 +88,11 @@ class SignUpPage extends Component<Props> {
               password: "",
               firstName: "",
               lastName: "",
-              phoneNumber: ""
+              phoneNumber: "",
+              userName: ""
             }}
             validationSchema={schema}
-            onSubmit={console.log}
+            onSubmit={values => userStore!.createAccount(values)}
             validateOnBlur={true}
           >
             {({
@@ -90,7 +121,7 @@ class SignUpPage extends Component<Props> {
                       {errors.firstName}
                     </Form.Control.Feedback>
                   </Form.Group>
-                  <Form.Group as={Col} md="6" controlId="validationFormik02">
+                  <Form.Group as={Col} md="6" controlId="lastName">
                     <Form.Label>Last name</Form.Label>
                     <Form.Control
                       type="text"
@@ -104,6 +135,40 @@ class SignUpPage extends Component<Props> {
                     />
                     <Form.Control.Feedback type="invalid">
                       {errors.lastName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Form.Row>
+                <Form.Row>
+                  <Form.Group as={Col} md="6" controlId="userName">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="userName"
+                      value={values.userName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isValid={touched.userName && !errors.userName}
+                      isInvalid={touched.userName && !!errors.userName}
+                      placeholder="johndoe"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.userName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group as={Col} md="6" controlId="phoneNumber">
+                    <Form.Label>Phone number</Form.Label>
+                    <Form.Control
+                      type="phone"
+                      name="phoneNumber"
+                      placeholder="+380*********"
+                      value={values.phoneNumber}
+                      isValid={touched.phoneNumber && !errors.phoneNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.phoneNumber && !!errors.phoneNumber}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.phoneNumber}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Form.Row>
@@ -141,26 +206,15 @@ class SignUpPage extends Component<Props> {
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Form.Row>
-                <Form.Group controlId="phoneNumber">
-                  <Form.Label>Phone number</Form.Label>
-                  <Form.Control
-                    type="phone"
-                    name="phoneNumber"
-                    placeholder="+380*********"
-                    value={values.phoneNumber}
-                    isValid={touched.phoneNumber && !errors.phoneNumber}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    isInvalid={touched.phoneNumber && !!errors.phoneNumber}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.phoneNumber}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                <FormError text={userStore!.errorReason.get() || ""} />
                 <Row className="justify-content-between align-items-center">
                   <Col md="6" xs="12" className="mb-2 mb-sm-0 ">
-                    <Button type="submit" className="w-100">
-                      Submit
+                    <Button
+                      type="submit"
+                      className="w-100"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? <Spinner animation="border" /> : "Submit"}
                     </Button>
                   </Col>
                   <Col md="6" xs="12" className="text-center text-md-left">
