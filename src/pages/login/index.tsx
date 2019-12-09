@@ -6,7 +6,6 @@ import { Button, Col, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
 
 import { MIN_PASSWORD_LENGTH } from '../../shared/constants';
-import { WithPath } from '../../shared/types';
 import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from '../../stores/user';
 
 type Props = {
@@ -29,13 +28,8 @@ const schema = yup.object({
 
 @inject(USER_STORE_TOKEN)
 @observer
-class LoginPage extends Component<WithPath<Props>> {
+class LoginPage extends Component<Props> {
   render() {
-    const { UserStore } = this.props;
-    if (UserStore!.user) {
-      return null;
-    }
-
     return (
       <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
         <div className="form-container__form p-3 rounded">
