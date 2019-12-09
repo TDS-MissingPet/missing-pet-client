@@ -1,0 +1,1 @@
+export type WithPath<T> = T & { path: string };

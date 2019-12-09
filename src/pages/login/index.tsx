@@ -6,12 +6,11 @@ import { Button, Col, Form, Row } from 'react-bootstrap';
 import * as yup from 'yup';
 
 import { MIN_PASSWORD_LENGTH } from '../../shared/constants';
+import { WithPath } from '../../shared/types';
 import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from '../../stores/user';
-import './index.css';
 
 type Props = {
   [USER_STORE_TOKEN]?: UserStore;
-  path: string;
 };
 
 const schema = yup.object({
@@ -30,7 +29,7 @@ const schema = yup.object({
 
 @inject(USER_STORE_TOKEN)
 @observer
-class LoginPage extends Component<Props> {
+class LoginPage extends Component<WithPath<Props>> {
   render() {
     const { UserStore } = this.props;
     if (UserStore!.user) {
@@ -38,12 +37,12 @@ class LoginPage extends Component<Props> {
     }
 
     return (
-      <div className="mx-auto login d-flex flex-column justify-content-center h-100">
-        <div className="login__form p-3 rounded">
+      <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
+        <div className="form-container__form p-3 rounded">
           <h2>Log in</h2>
-          <strong className="mb-2">
-            Please do it to have full access to the web site
-          </strong>
+          <span className="mb-2 mb-md-4 d-block text-muted">
+            Please authorize to have full access to the web site.
+          </span>
           <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={schema}
@@ -91,7 +90,7 @@ class LoginPage extends Component<Props> {
                     {errors.password}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Row className="justify-content-between">
+                <Row className="justify-content-between align-items-center">
                   <Col md="6" xs="12" className="mb-2 mb-sm-0 ">
                     <Button type="submit" className="w-100">
                       Log in
@@ -99,7 +98,7 @@ class LoginPage extends Component<Props> {
                   </Col>
                   <Col md="6" xs="12" className="text-center text-md-left">
                     <span className="d-block w-100">
-                      Do not have an account? <Link to="signup">Create one here.</Link>
+                      Do not have an account? <Link to="/">Create one here.</Link>
                     </span>
                   </Col>
                 </Row>

@@ -1,5 +1,5 @@
 .app {
-  height: 100vh;
+  min-height: 100vh;
   background: #eeeeee;
 }
 
@@ -10,8 +10,22 @@
   width: 100vw;
   left: 0;
   top: 0;
+  max-height: 60px;
+  z-index: 999;
 }
 
 .app .app__content {
   height: 100%;
+}
+
+.form-container {
+  max-width: 560px;
+}
+
+.form-container .form-container__form {
+  background: #ffffff;
+}
+
+.spacer-60 {
+  height: 60px;
 }
