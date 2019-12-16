@@ -21,6 +21,7 @@ import "./index.css";
 interface Props {
   [ADVERTISEMENT_STORE_TOKEN]: AdvertisementStore;
   [NOTIFICATION_STORE_TOKEN]: NotificationStore;
+  userId?: number;
 }
 
 interface State {
@@ -68,11 +69,15 @@ class DashboardPage extends Component<RouteComponentProps<Props>, State> {
   };
 
   render() {
-    const adStore = this.props[ADVERTISEMENT_STORE_TOKEN];
+    const { [ADVERTISEMENT_STORE_TOKEN]: adStore, userId } = this.props;
     const isLoading = adStore!.isLoading;
     const isError = adStore!.isError;
-    const ads = adStore!.ads;
     const { showAddItemModal } = this.state;
+    let ads = adStore!.ads;
+
+    if (userId) {
+      ads = ads.filter(ad => ad.accountId === Number(userId));
+    }
 
     if (isLoading) {
       return (

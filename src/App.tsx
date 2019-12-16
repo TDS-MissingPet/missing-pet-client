@@ -31,6 +31,12 @@ const App: React.FC = () => {
           fallback="/authorization"
           path="/dashboard"
         />
+        <AuthManager
+          check={user => !!user && !!user.accessToken}
+          success={<DashboardPage />}
+          fallback="/authorization"
+          path="/dashboard/:userId"
+        />
       </Router>
     </div>
   );
