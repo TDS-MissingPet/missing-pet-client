@@ -29,7 +29,7 @@ const schema = yup.object({
 
 const reactions: mobx.IReactionDisposer[] = [];
 
-@inject(USER_STORE_TOKEN)
+@inject(USER_STORE_TOKEN, ADVERTISEMENT_STORE_TOKEN)
 @observer
 class LoginPage extends Component<Props> {
   componentDidMount() {
