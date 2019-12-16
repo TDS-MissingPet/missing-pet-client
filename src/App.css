@@ -3,17 +3,6 @@
   background: #eeeeee;
 }
 
-.app .app__header {
-  position: fixed;
-  background: #563D7B;
-  color: #fff;
-  width: 100vw;
-  left: 0;
-  top: 0;
-  max-height: 60px;
-  z-index: 999;
-}
-
 .app .app__content {
   height: 100%;
 }

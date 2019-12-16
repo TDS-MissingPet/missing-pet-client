@@ -6,4 +6,5 @@ export interface User {
   phoneNumber: string;
   password: string;
   accessToken?: string;
+  id?: number;
 }

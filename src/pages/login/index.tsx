@@ -1,13 +1,14 @@
-import { Link } from '@reach/router';
-import { Formik } from 'formik';
-import { inject, observer } from 'mobx-react';
-import React, { Component } from 'react';
-import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
-import * as yup from 'yup';
+import { Link, navigate } from "@reach/router";
+import { Formik } from "formik";
+import { inject, observer } from "mobx-react";
+import * as mobx from "mobx";
+import React, { Component } from "react";
+import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
+import * as yup from "yup";
 
-import { FormError } from '../../components';
-import { MIN_PASSWORD_LENGTH } from '../../shared/constants';
-import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from '../../stores/user';
+import { FormError } from "../../components";
+import { MIN_PASSWORD_LENGTH } from "../../shared/constants";
+import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from "../../stores/user";
 
 type Props = {
   [USER_STORE_TOKEN]?: UserStore;
@@ -27,11 +28,26 @@ const schema = yup.object({
 @inject(USER_STORE_TOKEN)
 @observer
 class LoginPage extends Component<Props> {
+  componentDidMount() {
+    const userStore = this.props[USER_STORE_TOKEN]!;
+
+    mobx.reaction(
+      () => userStore.isAuthorized,
+      () => {
+        navigate("/dashboard");
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    this.props[USER_STORE_TOKEN]!.resetError();
+  }
+
   render() {
     const userStore = this.props[USER_STORE_TOKEN];
     const isSubmitting = userStore!.isLoading;
-    const userName = userStore!.isSignedUp ? userStore!.user!.userName : '';
-    const password = userStore!.isSignedUp ? userStore!.user!.password : '';
+    const userName = userStore!.isSignedUp ? userStore!.user!.userName : "";
+    const password = userStore!.isSignedUp ? userStore!.user!.password : "";
 
     return (
       <div className="mx-auto form-container d-flex flex-column justify-content-center h-100">
@@ -90,7 +106,7 @@ class LoginPage extends Component<Props> {
                 <FormError text={userStore!.errorReason.get() || ""} />
                 <Row className="justify-content-between align-items-center">
                   <Col md="6" xs="12" className="mb-2 mb-sm-0 ">
-                  <Button
+                    <Button
                       type="submit"
                       className="w-100"
                       disabled={isSubmitting}
@@ -100,7 +116,8 @@ class LoginPage extends Component<Props> {
                   </Col>
                   <Col md="6" xs="12" className="text-center text-md-left">
                     <span className="d-block w-100">
-                      Do not have an account? <Link to="/">Create one here.</Link>
+                      Do not have an account?{" "}
+                      <Link to="/">Create one here.</Link>
                     </span>
                   </Col>
                 </Row>

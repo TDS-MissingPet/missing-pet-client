@@ -1,6 +1,7 @@
 import { AxiosInstance, AxiosError } from "axios";
 import Cookie from "js-cookie";
 import flatten from "lodash/flatten";
+import qs from "querystring";
 
 import { User } from "../../stores/user";
 import { httpClient } from "../http";
@@ -19,6 +20,11 @@ export class UserService {
     return this._user;
   }
 
+  reset() {
+    Cookie.remove(MISSING_PET_USER_COOKIE);
+    this._user = undefined;
+  }
+
   async createAccount(payload: Account) {
     try {
       const apiBody = {
@@ -30,8 +36,8 @@ export class UserService {
         LastName: payload.lastName,
         PhoneNumber: payload.phoneNumber
       };
-      await this._http.post<void>("/api/account", apiBody);
-      this._user = payload;
+      const res = await this._http.post<number>("/api/account", apiBody);
+      this._user = { ...payload, id: res.data };
       return this._user;
     } catch (e) {
       const res = (e as AxiosError).response;
@@ -49,7 +55,10 @@ export class UserService {
         username: payload.userName,
         password: payload.password
       };
-      const res = await this._http.post<{ access_token: string, userName: string }>("/token", apiBody, {
+      const res = await this._http.post<{
+        access_token: string;
+        userName: string;
+      }>("/token", qs.stringify(apiBody), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         }
@@ -66,8 +75,8 @@ export class UserService {
     }
   }
 
-  private storeUser(data: { access_token: string, userName: string }) {
-    const user = this._user || {} as Partial<User>;
+  private storeUser(data: { access_token: string; userName: string }) {
+    const user = this._user || ({} as Partial<User>);
     user.accessToken = data.access_token;
     user.userName = user.userName || data.userName;
     Cookie.set(MISSING_PET_USER_COOKIE, JSON.stringify(user));

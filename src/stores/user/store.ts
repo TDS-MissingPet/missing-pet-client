@@ -76,6 +76,7 @@ export class UserStore {
       });
       const accessToken = await this.userService.authorize(payload);
       runInAction(() => {
+        this.user = this.user || ({} as User);
         this.user!.accessToken = accessToken;
         this.state.set(States.SUCCESS);
       });
@@ -90,5 +91,11 @@ export class UserStore {
   @action
   resetUser() {
     this.user = undefined;
+    this.userService.reset();
+  }
+
+  @action
+  resetError() {
+    this.errorReason.set("");
   }
 }
