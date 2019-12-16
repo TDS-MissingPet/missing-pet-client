@@ -25,22 +25,27 @@ const schema = yup.object({
     .min(MIN_PASSWORD_LENGTH)
 });
 
+const reactions: mobx.IReactionDisposer[] = [];
+
 @inject(USER_STORE_TOKEN)
 @observer
 class LoginPage extends Component<Props> {
   componentDidMount() {
     const userStore = this.props[USER_STORE_TOKEN]!;
 
-    mobx.reaction(
+    const disposer = mobx.reaction(
       () => userStore.isAuthorized,
       () => {
         navigate("/dashboard");
       }
     );
+
+    reactions.push(disposer);
   }
 
   componentWillUnmount() {
     this.props[USER_STORE_TOKEN]!.resetError();
+    reactions.forEach(dispose => dispose);
   }
 
   render() {

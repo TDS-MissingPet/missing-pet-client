@@ -23,13 +23,22 @@ export class AdvertisementStore {
     return this.state.get() === States.LOADING;
   }
 
+  @computed
+  get isError() {
+    return this.state.get() === States.FAILED;
+  }
+
   @action
   async loadItems() {
-    runInAction(() => this.state.set(States.LOADING));
-    const items = await this.advertisementService.getItems();
-    runInAction(() => {
-      this.ads = items;
-      this.state.set(States.SUCCESS);
-    });
+    try {
+      runInAction(() => this.state.set(States.LOADING));
+      const items = await this.advertisementService.getItems();
+      runInAction(() => {
+        this.ads = items;
+        this.state.set(States.SUCCESS);
+      });
+    } catch (e) {
+      runInAction(() => this.state.set(States.FAILED));
+    }
   }
 }

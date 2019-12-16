@@ -52,6 +52,8 @@ const schema = yup.object({
     .trim()
 });
 
+const reactions: mobx.IReactionDisposer[] = [];
+
 @inject(USER_STORE_TOKEN, NOTIFICATION_STORE_TOKEN)
 @observer
 class SignUpPage extends Component<Props> {
@@ -59,7 +61,7 @@ class SignUpPage extends Component<Props> {
     const userStore = this.props[USER_STORE_TOKEN];
     const notificationStore = this.props[NOTIFICATION_STORE_TOKEN];
 
-    mobx.reaction(
+    const disposer = mobx.reaction(
       () => userStore!.isSignedUp,
       () => {
         notificationStore!.addNotification({
@@ -69,6 +71,12 @@ class SignUpPage extends Component<Props> {
         navigate("authorization");
       }
     );
+    reactions.push(disposer);
+  }
+
+  componentWillUnmount() {
+    this.props[USER_STORE_TOKEN]!.resetError();
+    reactions.forEach(dispose => dispose);
   }
 
   render() {
