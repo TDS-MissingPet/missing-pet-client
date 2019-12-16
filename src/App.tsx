@@ -6,6 +6,7 @@ import DashboardPage from "./pages/dashboard";
 import LoginPage from "./pages/login";
 import SignUpPage from "./pages/signup";
 import "./App.css";
+import AdDetailsPage from "./pages/ad-details";
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,12 @@ const App: React.FC = () => {
           success={<DashboardPage />}
           fallback="/authorization"
           path="/dashboard"
+        />
+        <AuthManager
+          check={user => !!user && !!user.accessToken}
+          success={<AdDetailsPage />}
+          fallback="/authorization"
+          path="/dashboard/ads/:idx"
         />
         <AuthManager
           check={user => !!user && !!user.accessToken}

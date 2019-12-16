@@ -29,6 +29,19 @@ export class AdvertisementStore {
     return this.state.get() === States.FAILED;
   }
 
+  @computed
+  get itemsWereFetched() {
+    return this.state.get() === States.SUCCESS;
+  }
+
+  getItem(idx: number) {
+    const wrapper = computed(() => {
+      const value = this.ads[idx];
+      return value;
+    });
+    return wrapper.get();
+  }
+
   @action
   async loadItems() {
     try {
@@ -52,5 +65,11 @@ export class AdvertisementStore {
     } catch (e) {
       runInAction(() => this.state.set(States.FAILED));
     }
+  }
+
+  @action
+  reset () {
+    this.ads = [];
+    this.state.set(States.INITIAL);
   }
 }

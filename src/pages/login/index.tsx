@@ -9,9 +9,11 @@ import * as yup from "yup";
 import { FormError } from "../../components";
 import { MIN_PASSWORD_LENGTH } from "../../shared/constants";
 import { STORE_TOKEN as USER_STORE_TOKEN, UserStore } from "../../stores/user";
+import { STORE_TOKEN as ADVERTISEMENT_STORE_TOKEN, AdvertisementStore } from "../../stores/advertisement";
 
 type Props = {
   [USER_STORE_TOKEN]?: UserStore;
+  [ADVERTISEMENT_STORE_TOKEN]?: AdvertisementStore
 };
 
 const schema = yup.object({
@@ -32,6 +34,8 @@ const reactions: mobx.IReactionDisposer[] = [];
 class LoginPage extends Component<Props> {
   componentDidMount() {
     const userStore = this.props[USER_STORE_TOKEN]!;
+    const adStore = this.props[ADVERTISEMENT_STORE_TOKEN];
+    adStore!.reset();
 
     const disposer = mobx.reaction(
       () => userStore.isAuthorized,

@@ -13,10 +13,12 @@ import {
   STORE_TOKEN as NOTIFICATION_STORE_TOKEN,
   NotificationStore
 } from "../../stores/notification";
+import { STORE_TOKEN as ADVERTISEMENT_STORE_TOKEN, AdvertisementStore } from "../../stores/advertisement";
 
 type Props = {
   [USER_STORE_TOKEN]?: UserStore;
   [NOTIFICATION_STORE_TOKEN]?: NotificationStore;
+  [ADVERTISEMENT_STORE_TOKEN]?: AdvertisementStore
 };
 
 const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
@@ -60,6 +62,9 @@ class SignUpPage extends Component<Props> {
   componentDidMount() {
     const userStore = this.props[USER_STORE_TOKEN];
     const notificationStore = this.props[NOTIFICATION_STORE_TOKEN];
+    const adStore = this.props[ADVERTISEMENT_STORE_TOKEN];
+
+    adStore!.reset();
 
     const disposer = mobx.reaction(
       () => userStore!.isSignedUp,

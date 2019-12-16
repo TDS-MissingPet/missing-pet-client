@@ -1,5 +1,5 @@
 
-import { RouteComponentProps } from "@reach/router";
+import { RouteComponentProps, navigate } from "@reach/router";
 import { inject, observer } from "mobx-react";
 import React, { Component } from "react";
 import { Spinner, Button } from "react-bootstrap";
@@ -40,7 +40,9 @@ class DashboardPage extends Component<RouteComponentProps<Props>, State> {
   componentDidMount() {
     const adStore = this.props[ADVERTISEMENT_STORE_TOKEN];
     const notificationStore = this.props[NOTIFICATION_STORE_TOKEN];
-    adStore!.loadItems();
+    if (!adStore!.itemsWereFetched) {
+      adStore!.loadItems();
+    };
 
     const disposer = mobx.reaction(
       () => adStore!.isError,
@@ -67,6 +69,10 @@ class DashboardPage extends Component<RouteComponentProps<Props>, State> {
   createItem = (values: AdvertisementPayload) => {
     this.props[ADVERTISEMENT_STORE_TOKEN]!.createItem(values);
   };
+
+  goToItem = (idx: number) => {
+    navigate(`/dashboard/ads/${idx}`);
+  }
 
   render() {
     const { [ADVERTISEMENT_STORE_TOKEN]: adStore, userId } = this.props;
@@ -113,6 +119,7 @@ class DashboardPage extends Component<RouteComponentProps<Props>, State> {
               tags={a.tags}
               imageUrl={a.imageUrl}
               creationDate={a.creationDate}
+              onClick={() => this.goToItem(i)}
             />
           ))}
         </div>

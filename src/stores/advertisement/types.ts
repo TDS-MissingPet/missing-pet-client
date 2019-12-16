@@ -6,4 +6,9 @@ export interface Advertisement {
   creationDate: string;
   imageUrl?: string;
   accountId: number;
+  account: {
+    FirstName: string;
+    LastName: string;
+    PhoneNumber: string;
+  }
 }

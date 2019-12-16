@@ -12,9 +12,10 @@ export interface Props {
   tags: string[];
   creationDate: string;
   imageUrl?: string;
+  onClick: (...args: any[]) => void;
 }
 
-const badges = [
+export const badges = [
   "primary",
   "secondary",
   "success",
@@ -31,7 +32,8 @@ const Advertisement: React.SFC<Props> = ({
   reward,
   tags,
   imageUrl,
-  creationDate
+  creationDate,
+  onClick
 }) => {
   const tagsComponents = useMemo(
     () =>
@@ -62,7 +64,7 @@ const Advertisement: React.SFC<Props> = ({
             <strong>Posted at:</strong> {new Date(creationDate).toDateString()}
           </div>
         </div>
-        <Button variant="primary" className="w-100">
+        <Button variant="primary" className="w-100" onClick={onClick}>
           See details
         </Button>
       </div>
