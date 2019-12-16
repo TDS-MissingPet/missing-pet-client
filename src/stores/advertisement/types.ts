@@ -5,4 +5,5 @@ export interface Advertisement {
   tags: string[];
   creationDate: string;
   imageUrl?: string;
+  accountId: number;
 }

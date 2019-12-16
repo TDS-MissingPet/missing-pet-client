@@ -58,6 +58,7 @@ export class UserService {
       const res = await this._http.post<{
         access_token: string;
         userName: string;
+        id: string;
       }>("/token", qs.stringify(apiBody), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
@@ -75,10 +76,11 @@ export class UserService {
     }
   }
 
-  private storeUser(data: { access_token: string; userName: string }) {
+  private storeUser(data: { access_token: string; userName: string, id: string }) {
     const user = this._user || ({} as Partial<User>);
     user.accessToken = data.access_token;
     user.userName = user.userName || data.userName;
+    user.id = user.id || Number(data.id);
     Cookie.set(MISSING_PET_USER_COOKIE, JSON.stringify(user));
   }
 }

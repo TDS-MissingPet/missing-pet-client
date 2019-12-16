@@ -5,3 +5,18 @@
   width: 128px;
   height: 128px;
 }
+
+.dashboard__add-item {
+  position: fixed;
+  z-index: 1000;
+  bottom: 0;
+  width: 100vw;
+  margin-left: -1rem;
+}
+
+.dashboard__add-item button {
+  width: 100%;
+  max-width: 480px;
+  display: block;
+  margin: 0 auto;
+}

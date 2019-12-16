@@ -2,6 +2,7 @@ import { observable, runInAction, action, IObservableValue, computed } from "mob
 
 import { Advertisement } from './types';
 import { AdvertisementService, AdvertisementServiceType } from "../../services";
+import { AdvertisementPayload } from "../../services/advertisement/types";
 
 export enum States {
   INITIAL,
@@ -37,6 +38,17 @@ export class AdvertisementStore {
         this.ads = items;
         this.state.set(States.SUCCESS);
       });
+    } catch (e) {
+      runInAction(() => this.state.set(States.FAILED));
+    }
+  }
+
+  @action
+  async createItem(payload: AdvertisementPayload) {
+    try {
+      runInAction(() => this.state.set(States.LOADING));
+      await this.advertisementService.createItem(payload);
+      runInAction(() => this.loadItems());
     } catch (e) {
       runInAction(() => this.state.set(States.FAILED));
     }

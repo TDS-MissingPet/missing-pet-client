@@ -76,8 +76,8 @@ class LoginPage extends Component<Props> {
               handleBlur
             }) => (
               <Form noValidate onSubmit={handleSubmit}>
-                <Form.Group controlId="email">
-                  <Form.Label>Email</Form.Label>
+                <Form.Group controlId="userName">
+                  <Form.Label>Username</Form.Label>
                   <Form.Control
                     type="text"
                     name="userName"

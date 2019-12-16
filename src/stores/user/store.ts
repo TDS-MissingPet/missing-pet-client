@@ -44,7 +44,7 @@ export class UserStore {
 
   @computed
   get isAuthorized() {
-    return Boolean(this.user) && Object.values(this.user!).every(Boolean);
+    return Boolean(this.user) && Boolean(this.user!.accessToken);
   }
 
   @action
