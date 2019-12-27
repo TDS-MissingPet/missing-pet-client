@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import startCase from "lodash/startCase";
@@ -30,6 +30,7 @@ interface Props {
 }
 
 const CreateAdForm: React.SFC<Props> = ({ onSubmit, onClose = () => {} }) => {
+  const [image, setImage] = useState(null);
   const handleSubmit = useCallback(values => {
     const result: any = validationSchema.cast(values);
     if (result.tags) {
@@ -37,15 +38,21 @@ const CreateAdForm: React.SFC<Props> = ({ onSubmit, onClose = () => {} }) => {
     } else {
       result.tags = [];
     }
-    onSubmit(result);
-  }, [onSubmit]);
+    onSubmit({ ...result, image });
+  }, [onSubmit, image]);
+
+  const onImageChange = useCallback(e => {
+    const file = e.target.files[0];
+    setImage(file);
+  }, [setImage]);
 
   const formik = useFormik({
     initialValues: {
       title: "",
       text: "",
       reward: 0,
-      tags: ""
+      tags: "",
+      image: "",
     },
     validationSchema,
     validateOnBlur: true,
@@ -118,6 +125,19 @@ const CreateAdForm: React.SFC<Props> = ({ onSubmit, onClose = () => {} }) => {
         </Form.Control.Feedback>
         <Form.Text className="text-muted text-center text-md-left">
           Please separate your tags with semicolons
+        </Form.Text>
+      </Form.Group>
+      <Form.Group controlId="addItemForm.image">
+        <Form.Label>Pet image</Form.Label>
+        <Form.Control
+          as="input"
+          type="file"
+          name="image"
+          accept=".jpg, .jpeg, .png"
+          onChange={onImageChange}
+        />
+        <Form.Text className="text-muted text-center text-md-left">
+          Upload image of you pet
         </Form.Text>
       </Form.Group>
       <Row className="justify-content-between align-items-center">

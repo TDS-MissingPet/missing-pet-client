@@ -34,7 +34,13 @@ export class AdvertisementService {
     });
     const adId = itemCreationRes.data;
     if (image) {
-      // TODO: implement image upload
+      const form = new FormData();
+      form.append('image', image);
+      await this._http.post(`/api/images/${adId}`, form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
     }
   }
 }
