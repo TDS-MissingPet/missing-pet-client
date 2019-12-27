@@ -27,7 +27,6 @@ const schema = yup.object({
     .min(MIN_PASSWORD_LENGTH)
 });
 
-const reactions: mobx.IReactionDisposer[] = [];
 
 @inject(USER_STORE_TOKEN, ADVERTISEMENT_STORE_TOKEN)
 @observer
@@ -37,19 +36,12 @@ class LoginPage extends Component<Props> {
     const adStore = this.props[ADVERTISEMENT_STORE_TOKEN];
     adStore!.reset();
 
-    const disposer = mobx.reaction(
-      () => userStore.isAuthorized,
+    mobx.reaction(
+      () => userStore!.isAuthorized,
       () => {
-        navigate("/dashboard");
+        window.location.reload();
       }
     );
-
-    reactions.push(disposer);
-  }
-
-  componentWillUnmount() {
-    this.props[USER_STORE_TOKEN]!.resetError();
-    reactions.forEach(dispose => dispose);
   }
 
   render() {
