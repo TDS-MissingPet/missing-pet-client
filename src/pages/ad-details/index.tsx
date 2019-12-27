@@ -1,7 +1,14 @@
 import sample from "lodash/sample";
 import { inject, observer } from "mobx-react";
 import React, { useEffect, useMemo } from "react";
-import { Badge, Card, Col, Row, Button } from "react-bootstrap";
+import {
+  Badge,
+  Card,
+  Col,
+  Row,
+  Button,
+  Image,
+} from "react-bootstrap";
 
 import { badges } from "../../components/advertisement";
 import {
@@ -51,8 +58,21 @@ const AdDetailsPage: React.SFC<Props> = ({
 
   return (
     <div>
-      <Button variant="link" className="p-0" onClick={() => window.history.back()}>Go Back</Button>
+      <Button
+        variant="link"
+        className="p-0"
+        onClick={() => window.history.back()}
+      >
+        Go Back
+      </Button>
       <h1 className="border-bottom my-4">{item.title}</h1>
+      {item.imageUrl ? (
+          <Row className="mb-2">
+            <Col xs={6}>
+              <Image src={item.imageUrl} thumbnail />
+            </Col>
+          </Row>
+      ) : null}
       <Row
         as={Card}
         className="ad-details__content flex-row p-2 mx-auto mx-md-0"
@@ -64,10 +84,12 @@ const AdDetailsPage: React.SFC<Props> = ({
             </Card.Header>
             <Card.Body className="p-2">
               <p>{item.text}</p>
-              <small className="text-muted">Created on: {new Date(item.creationDate).toLocaleDateString()}</small>
+              <small className="text-muted">
+                Created on: {new Date(item.creationDate).toLocaleDateString()}
+              </small>
             </Card.Body>
           </Card>
-          Tags: {tagsComponents}
+          {tagsComponents.length ?  <><span>Tags</span>: {tagsComponents}</> : null}
         </Col>
         <Col md="4" xs="12">
           <strong className="d-block mb-1 mt-3 mt-md-0">Details:</strong>
@@ -78,12 +100,17 @@ const AdDetailsPage: React.SFC<Props> = ({
             </li>
             <li className="d-flex align-items-center justify-content-between">
               <span>Author</span>
-              <span className="font-weight-bold">{`${item.account.FirstName.slice(0, 1)}. ${item.account.LastName}`}</span>
+              <span className="font-weight-bold">{`${item.account.FirstName.slice(
+                0,
+                1
+              )}. ${item.account.LastName}`}</span>
             </li>
             <li className="d-flex align-items-center justify-content-between">
               <span>Phone</span>
               <span className="font-weight-bold">
-                <a href={`tel:${item.account.PhoneNumber}`}>{item.account.PhoneNumber}</a>
+                <a href={`tel:${item.account.PhoneNumber}`}>
+                  {item.account.PhoneNumber}
+                </a>
               </span>
             </li>
           </ul>
